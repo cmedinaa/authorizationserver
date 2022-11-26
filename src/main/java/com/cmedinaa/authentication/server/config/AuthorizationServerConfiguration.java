@@ -1,6 +1,5 @@
 package com.cmedinaa.authentication.server.config;
 
-import com.cmedinaa.authentication.server.entities.Client;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -16,14 +15,11 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
+import org.springframework.security.oauth2.server.authorization.config.TokenSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.KeyPair;
@@ -31,8 +27,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.util.List;
-import java.util.Optional;
+import java.time.Duration;
 import java.util.UUID;
 
 @Configuration
@@ -45,34 +40,8 @@ public class AuthorizationServerConfiguration {
 
     @Bean
     public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
-        List<Client> clients = jdbcTemplate.query("select * from auth.client"
-                , (rs, rowNum) -> {
-                    Client client = new Client();
-                    client.setId(rs.getLong("id"));
-                    client.setName(rs.getString("name"));
-                    client.setSecretKey(rs.getString("secretkey"));
-                    return client;
-                }
-        );
-
-        RegisteredClient registeredClient = Optional.ofNullable(clients.iterator().next())
-                .map(client -> {
-                    return RegisteredClient.withId(UUID.randomUUID().toString())
-                            .clientId(client.getName())
-                            .clientSecret(client.getSecretKey())
-                            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-                            .redirectUri("http://domicilio:8080/login/oauth2/code/users-client-oidc")
-                            .redirectUri("http://domicilio:8080/authorized")
-                            .scope(OidcScopes.OPENID)
-                            .scope("read")
-                            //.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-                            .build();
-                })
-                .get();
-
-        return new InMemoryRegisteredClientRepository(registeredClient);
+        RegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
+        return registeredClientRepository;
     }
 
 
@@ -89,6 +58,12 @@ public class AuthorizationServerConfiguration {
     public ProviderSettings providerSettings() {
         return ProviderSettings.builder()
                 .issuer(providerUrl)
+                .build();
+    }
+
+    public TokenSettings tokenSettings() {
+        return TokenSettings.builder()
+                .accessTokenTimeToLive(Duration.ofMinutes(30L))
                 .build();
     }
 
