@@ -10,12 +10,22 @@ not expect in this example to find Oauth2 flow implementations, it is provided b
 
 ##Requirements
 
-* You need along this backed two more which represent the resource and client servers.
+* You need along this backed two more:
+  * [Permissions resource server](https://github.com/cmedinaa/permissions.git)
+  * [Permissions client server](https://github.com/cmedinaa/permissionclient.git)
+
 * It's designed so that you can run it in your local PC ( no docker containerization so far ). This requires some local domain
   names defined in the local environment, namely "_domicilio_" and "_kubernetes.docker.internal_". Make sure you have them before running the backends.
   * authorization server -> _kubernetes.docker.internal_
   * resource server -> _localhost_
   * client server -> _domicilio_
+
+* PostgreSQL server. Set up the next environment variables accordingly:
+  * DB_HOST
+  * DB_PORT
+  * DB_NAME
+
+* You will find the required database structure and data in the file src/main/resources/sql/auth.sql
 
 ##Use
 Access to URL http://domicilio:8080/permissions/all in a web browser
