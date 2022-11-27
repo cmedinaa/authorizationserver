@@ -25,7 +25,7 @@ not expect in this example to find Oauth2 flow implementations, it is provided b
   * DB_PORT
   * DB_NAME
 
-* You will find the required database structure and data in the file src/main/resources/sql/auth.sql
+* You will find the required database structure and data in the file `src/main/resources/sql/auth.sql`
 
 ##Use
 Access to URL http://domicilio:8080/permissions/all in a web browser
