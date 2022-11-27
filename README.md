@@ -2,13 +2,13 @@
 
 Simple example to show how to deal with a client app that makes use of oauth protocol for authentication and authorization topics
 
-##Scope
+## Scope
 
 It just shows how to set up a spring client to make it work with a single resource server and the corresponding client
 backend as well. It's not meant to deal with the low level details of Oauth2 protocol, this means, do
 not expect in this example to find Oauth2 flow implementations, it is provided by third parties included in the pom.xml
 
-##Requirements
+## Requirements
 
 * You need along this backed two more:
   * [Permissions resource server](https://github.com/cmedinaa/permissions.git)
@@ -27,5 +27,5 @@ not expect in this example to find Oauth2 flow implementations, it is provided b
 
 * You will find the required database structure and data in the file `src/main/resources/sql/auth.sql`
 
-##Use
+## Use
 Access to URL http://domicilio:8080/permissions/all in a web browser
